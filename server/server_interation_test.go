@@ -12,29 +12,34 @@ import (
 const jsonContentType = "application/json"
 
 func TestLeague(t *testing.T) {
-	t.Run("it returns the league table as JSON", func(t *testing.T) {
-		wantedLeague := []Player{
-			{"Cleo", 32},
-			{"Chris", 20},
-			{"Tiest", 14},
-		}
+	store := NewInMemoryPlayerStore()
+	server := NewPlayerServer(store)
+	player := "Pepper"
 
-		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := NewPlayerServer(&store)
+	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(player))
+	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(player))
+	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(player))
 
-		request := newLeagueRequest()
+	t.Run("get score", func(t *testing.T) {
 		response := httptest.NewRecorder()
-
-		server.ServeHTTP(response, request)
-
-		got := getLeagueFromResponse(t, response.Body)
-
+		server.ServeHTTP(response, newGetScoreRequest(player))
 		assertStatus(t, response.Code, http.StatusOK)
 
-		assertLeague(t, got, wantedLeague)
-
-		assertContentype(t, response, jsonContentType)
+		assertResponseBody(t, response.Body.String(), "3")
 	})
+
+	t.Run("get league", func(t *testing.T) {
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, newLeagueRequest())
+		assertStatus(t, response.Code, http.StatusOK)
+
+		got := getLeagueFromResponse(t, response.Body)
+		want := []Player{
+			{"Pepper", 3},
+		}
+		assertLeague(t, got, want)
+	})
+
 }
 
 func newLeagueRequest() *http.Request {
