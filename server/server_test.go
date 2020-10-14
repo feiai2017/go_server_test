@@ -95,10 +95,6 @@ func TestStoreWins(t *testing.T)  {
 	})
 }
 
-func TestRecordingWinsAndRetrieving(t *testing.T)  {
-}
-
-
 func newGetScoreRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
 

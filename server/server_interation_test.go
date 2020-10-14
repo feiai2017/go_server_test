@@ -65,7 +65,7 @@ func assertContentype(t *testing.T, response *httptest.ResponseRecorder, want st
 	}
 }
 
-func assertLeague(t *testing.T, got, want []Player)  {
+func assertLeague(t *testing.T, got, want []Player) {
 	t.Helper()
 
 	if !reflect.DeepEqual(got, want){
