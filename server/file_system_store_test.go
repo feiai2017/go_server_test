@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -30,9 +28,6 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	} else {
 		f.league = append(f.league, Player{name, 1})
 	}
-
-	f.database.Seek(0, 0)
-	json.NewEncoder(f.database).Encode(f.league)
 }
 
 func TestFileSystemStore(t *testing.T) {
@@ -110,7 +105,7 @@ func assertScoreEquals(t *testing.T, got, want int)  {
 	}
 }
 
-func createTempFile(t *testing.T, initialData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t *testing.T, initialData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpfile, err := ioutil.TempFile("", "db")

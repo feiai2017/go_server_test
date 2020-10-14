@@ -4,20 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 )
 
 type League []Player
 
 type FileSystemPlayerStore struct {
-	database io.ReadWriteSeeker
+	database *json.Encoder
 	league League
 }
 
-func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
-	database.Seek(0, 0)
-	league, _ := NewLeague(database)
+func NewFileSystemPlayerStore(file *os.File) *FileSystemPlayerStore {
+	file.Seek(0, 0)
+	league, _ := NewLeague(file)
+
 	return &FileSystemPlayerStore{
-		database: database,
+		database: json.NewEncoder(&tape{file}),
 		league: league,
 	}
 }
