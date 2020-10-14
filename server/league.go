@@ -8,6 +8,20 @@ import (
 
 type League []Player
 
+type FileSystemPlayerStore struct {
+	database io.ReadWriteSeeker
+	league League
+}
+
+func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+	database.Seek(0, 0)
+	league, _ := NewLeague(database)
+	return &FileSystemPlayerStore{
+		database: database,
+		league: league,
+	}
+}
+
 func (l League) Find(name string) *Player {
 	for i, p := range l {
 		if p.Name == name {
